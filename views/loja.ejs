@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dollya Store - Vitrine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: #111827;
+            --card-bg: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --accent: #5865f2;
+            --green: #22c55e;
+            --red: #ef4444;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .item-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            border: 1px solid #374151;
+        }
+        .item-card h2 {
+            font-size: 1.5rem;
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .item-card .emoji {
+            font-size: 2rem;
+        }
+        .item-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto; /* Empurra para o final */
+            padding-top: 1rem;
+            border-top: 1px solid #374151;
+        }
+        .price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stock-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        .stock-status.in-stock {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: var(--green);
+        }
+        .stock-status.out-of-stock {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--red);
+        }
+        .join-button {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 700;
+            transition: background-color 0.2s;
+        }
+        .join-button:hover {
+            background-color: #4338ca;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Vitrine da Dollya Store</h1>
+            <p>Confira nossos produtos! Para comprar, entre no nosso Discord.</p>
+            <a href="https://discord.gg/<%= guildId %>" class="join-button" target="_blank">Entrar no Servidor</a>
+        </header>
+
+        <div class="stock-grid">
+            <% stock.forEach(item => { %>
+                <div class="item-card">
+                    <h2><span class="emoji"><%= item.emoji %></span> <%= item.name %></h2>
+                    <div class="item-info">
+                        <span class="price">R$ <%= item.price.toFixed(2) %></span>
+                        <% if (item.quantity > 0) { %>
+                            <span class="stock-status in-stock">Em estoque</span>
+                        <% } else { %>
+                            <span class="stock-status out-of-stock">Esgotado</span>
+                        <% } %>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</body>
+</html>

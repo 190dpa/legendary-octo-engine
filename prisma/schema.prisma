@@ -1,0 +1,68 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StockItem {
+  id       String @id
+  name     String
+  emoji    String
+  quantity Int
+  price    Decimal
+  max      Int
+}
+
+model DeliveryRecord {
+  id            Int      @id @default(autoincrement())
+  timestamp     DateTime @default(now())
+  mention       String?
+  itemId        String
+  itemName      String
+  quantity      Int
+  photoUrl      String?
+  messageSent   Boolean @default(false)
+  messageStatus Int     @default(0)
+  ticketChannelId String?
+}
+
+model Configuration {
+  id                Int     @id @default(1)
+  mainChannelId     String?
+  deliveryChannelId String?
+  mainMessageId     String?
+  clientRoleId      String?
+  guildId           String?
+  reviewsChannelId  String?
+}
+
+model Coupon {
+  id                 Int      @id @default(autoincrement())
+  code               String   @unique
+  discountPercentage Float
+  usesLeft           Int
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+}
+
+model Punishment {
+  id              Int      @id @default(autoincrement())
+  userId          String   @unique
+  originalRoles   String[]
+  punishChannelId String
+  reason          String
+  createdAt       DateTime @default(now())
+}
+
+model Warning {
+  id          Int      @id @default(autoincrement())
+  userId      String
+  moderatorId String
+  reason      String
+  createdAt   DateTime @default(now())
+}

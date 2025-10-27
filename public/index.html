@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<title>DOLLYA STORE - Painel v2</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  /* Reset */
+  :root {
+    --bg-primary: #111827;      /* Azul-escuro quase preto */
+    --bg-secondary: #1f2937;     /* Azul-escuro mais claro */
+    --border-color: #374151;     /* Cinza-azulado para bordas */
+    --text-primary: #f9fafb;     /* Quase branco */
+    --text-secondary: #9ca3af;   /* Cinza claro para textos secundários */
+    --accent-primary: #3b82f6;   /* Azul vibrante */
+    --accent-hover: #60a5fa;     /* Azul mais claro para hover */
+    --danger: #ef4444;           /* Vermelho para ações perigosas */
+    --success: #22c55e;          /* Verde para sucesso */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    padding: 28px;
+    display: flex;
+    justify-content: center;
+  }
+  input, button, select, textarea { font-family: inherit; font-size: 100%; }
+  
+  /* Layout */
+  .app {
+    width: 1024px;
+    max-width: 98%;
+    background-color: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  }
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
+  .title { display: flex; gap: 16px; align-items: center; }
+  .logo { width: 52px; height: 52px; border-radius: 12px; background: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--text-primary); font-size: 20px; }
+  h1 { font-size: 22px; color: var(--text-primary); }
+  h3 { font-size: 16px; color: var(--text-primary); font-weight: 600; }
+  .tabs { display: flex; gap: 8px; }
+  .tab { padding: 10px 16px; border-radius: 8px; background: transparent; border: none; cursor: pointer; color: var(--text-secondary); font-weight: 600; transition: all 0.2s ease; }
+  .tab:hover { background-color: rgba(255,255,255,0.05); color: var(--text-primary); }
+  .tab.active { background-color: var(--accent-primary); color: var(--text-primary); }
+  
+  /* Grid */
+  .content { display: grid; grid-template-columns: 1fr 360px; gap: 24px; }
+  .left, .right { display: flex; flex-direction: column; gap: 16px; }
+  
+  /* Stock list */
+  .card {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+  .thumb { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; background-color: var(--bg-secondary); }
+  .meta { flex: 1; }
+  .meta h3 { font-size: 16px; color: var(--text-primary); margin-bottom: 4px; font-weight: 600; }
+  .meta small { color: var(--text-secondary); font-size: 13px; }
+  .controls { display: flex; gap: 8px; align-items: center; }
+  
+  /* Panels */
+  .panel {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    border-radius: 12px;
+  }
+  .panel h3 { margin-bottom: 16px; }
+  
+  /* Forms */
+  .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  label { font-size: 14px; font-weight: 500; color: var(--text-secondary); }
+  input[type="text"], input[type="number"], select, input[type="file"] {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+  }
+  input[type="text"]:focus, input[type="number"]:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4);
+  }
+  input::placeholder { color: #718096; }
+  input[type="file"] { padding: 8px; }
+  input[type="file"]::-webkit-file-upload-button {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 4px 10px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  
+  .small { font-size: 13px; color: var(--text-secondary); margin-top: 8px; line-height: 1.5; }
+  
+  /* deliveries */
+  .deliver-list { max-height: 420px; overflow-y: auto; padding-right: 8px; }
+  .delivery { background-color: var(--bg-secondary); padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid var(--border-color); }
+  .delivery time { font-size: 12px; color: var(--text-secondary); }
+  
+  /* Buttons */
+  button { transition: all 0.2s ease; }
+  .btn-primary {
+    background-color: var(--accent-primary);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  .btn-primary:hover { background-color: var(--accent-hover); }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    padding: 8px 14px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-ghost:hover { background-color: var(--bg-primary); border-color: var(--accent-primary); color: var(--text-primary); }
+  .btn-danger { background-color: var(--danger); }
+  
+  /* responsive */
+  @media(max-width: 960px){
+    .content { grid-template-columns: 1fr; }
+    .top { flex-direction: column; align-items: flex-start; gap: 16px; }
+  }
+</style>
+<style>
+  /* Estilos para a tela de login */
+  #login-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(17, 24, 39, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+  .login-box {
+    background-color: var(--bg-secondary);
+    padding: 2rem 2.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+  #login-error { color: var(--danger); font-size: 14px; margin-top: 10px; text-align: center; display: none; }
+</style>
+<style>
+  /* Estilos para a notificação (toast) */
+  #notification {
+    display: none; /* Escondido por padrão */
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translate(-50%, 100px);
+    background-color: #38a169; /* Verde sucesso */
+    color: white;
+    padding: 14px 22px;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+    font-weight: 600;
+    transition: transform 0.3s ease-in-out;
+  }
+  #notification.show {
+    transform: translateX(-50%);
+  }
+</style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div class="logo" style="margin: 0 auto 16px; width: 60px; height: 60px; font-size: 24px;">DS</div>
+      <h1 style="font-size: 24px;">Acessar Painel</h1>
+      <p style="color: var(--text-secondary); font-size: 15px; margin-top: 4px;">
+        Use suas credenciais para continuar.
+      </p>
+    </div>
+    <form id="login-form">
+      <div class="field"><label>Usuário</label><input id="login-user" type="text" required></div>
+      <div class="field"><label>Senha</label><input id="login-pass" type="password" required></div>
+      <button id="btn-login" type="submit" class="btn-primary" style="width:100%; margin-top: 16px;">Entrar</button>
+      <p id="login-error">Usuário ou senha inválidos.</p>
+    </form>
+  </div>
+</div>
+
+<div class="app" style="display: none;">
+  <div class="top">
+    <div class="title">
+      <div class="logo">DS</div>
+      <div>
+        <h1>DOLLYA STORE • Painel</h1>
+        <small style="color:var(--text-secondary)">Gerencie estoque, entregas e configurações do bot.</small>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" data-tab="stock">Stock</div>
+      <div class="tab" data-tab="deliveries">Entregas</div>
+      <div class="tab" data-tab="moderation">Moderação</div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="main-column">
+      <!-- STOCK area -->
+      <div id="tab-stock">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+          <button id="refresh-stock" class="btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Atualizar
+          </button>
+          <div style="flex:1"></div>
+          <button id="open-add" class="btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Novo Item
+          </button>
+        </div>
+
+        <div id="stock-list"></div>
+
+        <!-- add fruit panel (hidden by default) -->
+        <div id="add-fruit-panel" class="panel" style="display:none;margin-top:10px">
+          <div class="field">
+            <label>Nome (ex: STRAWBERRY)</label>
+            <input id="new-name" type="text" placeholder="Nome da fruta">
+          </div>
+          <div class="field">
+            <label>Emoji (ex: 🍓)</label>
+            <input id="new-emoji" type="text" placeholder="Emoji">
+          </div>
+          <div class="field">
+            <label>Preço (R$)</label>
+            <input id="new-price" type="number" step="0.01" placeholder="0.50">
+          </div>
+          <div class="field">
+            <label>Estoque inicial</label>
+            <input id="new-qty" type="number" placeholder="100">
+          </div>
+          <div style="display:flex;gap:8px">
+            <button id="btn-add-fruit" class="btn-primary">Adicionar Fruta</button>
+            <button id="btn-cancel-add" class="btn-ghost" style="background-color: var(--bg-secondary);">Cancelar</button>
+          </div>
+          <div class="small">O ID será gerado automaticamente a partir do nome. Ex: "Mr Carrot" vira "MR_CARROT".</div>
+        </div>
+        <div id="stock-list-container"></div>
+      </div>
+
+      <!-- DELIVERIES area -->
+      <div id="tab-deliveries" style="display:none">
+        <div class="panel" style="margin-bottom:12px">
+          <div class="field">
+            <label>Destinatário (ID ou @menção)</label>
+            <input id="delivery-mention" type="text" placeholder="@User ou 123456789">
+          </div>
+          <div class="field">
+            <label>Produto</label>
+            <select id="delivery-item"></select>
+          </div>
+          <div class="field">
+            <label>Quantidade</label>
+            <input id="delivery-qty" type="number" value="1" min="1">
+          </div>
+          <div class="field">
+            <label>Nota (opcional)</label>
+            <input id="delivery-note" type="text" placeholder="Observações">
+          </div>
+          <div class="field">
+            <label>Foto da Entrega (opcional)</label>
+            <input id="delivery-photo" type="file" accept="image/*">
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="btn-create-delivery" class="btn-primary">Gerar Entrega</button>
+            <button id="btn-clear-delivery" class="btn-ghost">Limpar</button>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom:8px">Histórico de Entregas</h3>
+        <div id="deliveries-list" class="deliver-list"></div>
+      </div>
+
+      <!-- MODERATION area -->
+      <div id="tab-moderation" style="display:none">
+        <h3>Usuários Banidos</h3>
+        <div id="banned-users-list" class="panel"></div>
+      </div>
+
+    </div>
+
+    <div class="sidebar">
+      <div class="panel">
+        <h3>Preview do Embed</h3>
+        <div id="embed-preview" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius:8px;padding:12px;color:#cfe9ff"></div>
+        <button id="btn-push-main" class="btn-primary" style="width:100%; margin-top:16px;">Enviar/Atualizar Embed</button>
+        <div class="small" style="margin-top:8px">Cria uma nova mensagem de estoque ou atualiza uma existente se o ID da mensagem estiver configurado.</div>
+      </div>
+
+      <div style="height:12px"></div>
+
+      <div class="panel">
+        <h3 style="margin-bottom:10px">Configurações</h3>
+        <div class="field"> 
+          <label>ID do Canal de Estoque (principal)</label>
+          <input id="config-stock-channel-id" type="text" placeholder="Cole o ID do canal de estoque">
+        </div>
+        <div class="field">
+          <label>ID do Canal de Entregas</label>
+          <input id="config-delivery-channel-id" type="text" placeholder="Cole o ID do canal de entregas">
+        </div>
+        <div class="field">
+          <label>ID da Mensagem de Estoque (para edição)</label>
+          <input id="config-main-message-id" type="text" placeholder="Opcional: cole o ID da mensagem a ser editada">
+        </div>
+        <div class="field">
+          <label>ID do Cargo de Cliente (para menção)</label>
+          <input id="config-client-role-id" type="text" placeholder="Opcional: cole o ID do cargo a ser mencionado">
+        </div>
+        <div class="field">
+          <label>ID do Servidor (Guild ID)</label>
+          <input id="config-guild-id" type="text" placeholder="Opcional: cole o ID do seu servidor">
+        </div>
+        <div class="field">
+          <label>ID do Canal de Avaliações</label>
+          <input id="config-reviews-channel-id" type="text" placeholder="Opcional: cole o ID do canal de avaliações">
+        </div>
+        <button id="btn-save-config" class="btn-primary" style="width:100%; margin-top:8px">Salvar Configurações</button>
+        <div id="config-external-note" class="small" style="display:none; margin-top:8px; text-align:center; color: #ffb86b;">As configurações são gerenciadas externamente (ex: Render).</div>
+      </div>
+
+      <div class="panel" style="margin-top: 16px;">
+        <h3>Ações Rápidas</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <button id="btn-export-json" class="btn-ghost" style="width:100%;">Exportar JSON</button>
+          <button id="btn-import-json" class="btn-ghost" style="width:100%;">Importar JSON</button>
+        </div>
+        <div class="small" style="margin-top:8px">Faça backup ou restaure o seu estoque.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Elemento para a notificação (toast) -->
+<div id="notification"></div>
+
+<script>
+/* front-end logic */
+const tabs = document.querySelectorAll('.tab');
+const tabStock = document.getElementById('tab-stock');
+const tabDeliveries = document.getElementById('tab-deliveries');
+const tabModeration = document.getElementById('tab-moderation');
+const stockListContainer = document.getElementById('stock-list-container');
+const appContainer = document.querySelector('.app');
+
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  tabStock.style.display = 'none';
+  tabDeliveries.style.display = 'none';
+  tabModeration.style.display = 'none';
+  const name = t.dataset.tab;
+  document.getElementById(`tab-${name}`).style.display = 'block';
+}));
+
+// elements
+const stockList = document.getElementById('stock-list-container');
+const refreshBtn = document.getElementById('refresh-stock');
+const openAddBtn = document.getElementById('open-add');
+const addPanel = document.getElementById('add-fruit-panel');
+const btnAddFruit = document.getElementById('btn-add-fruit');
+const btnCancelAdd = document.getElementById('btn-cancel-add');
+const newName = document.getElementById('new-name');
+const newEmoji = document.getElementById('new-emoji');
+const newPrice = document.getElementById('new-price');
+const newQty = document.getElementById('new-qty');
+
+const deliveryItemSelect = document.getElementById('delivery-item');
+const deliveriesList = document.getElementById('deliveries-list');
+const btnCreateDelivery = document.getElementById('btn-create-delivery');
+
+const embedPreview = document.getElementById('embed-preview');
+const btnPushMain = document.getElementById('btn-push-main');
+
+const btnExport = document.getElementById('btn-export-json');
+const btnImport = document.getElementById('btn-import-json');
+
+const mainMessageIdInput = document.getElementById('config-main-message-id');
+const stockChannelIdInput = document.getElementById('config-stock-channel-id');
+const deliveryChannelIdInput = document.getElementById('config-delivery-channel-id');
+const clientRoleIdInput = document.getElementById('config-client-role-id');
+const guildIdInput = document.getElementById('config-guild-id');
+const reviewsChannelIdInput = document.getElementById('config-reviews-channel-id');
+const btnSaveConfig = document.getElementById('btn-save-config');
+
+// Login elements
+const loginScreen = document.getElementById('login-screen');
+const loginForm = document.getElementById('login-form');
+const loginUser = document.getElementById('login-user');
+const loginPass = document.getElementById('login-pass');
+const loginError = document.getElementById('login-error');
+const bannedUsersList = document.getElementById('banned-users-list');
+
+let STOCK = []; // local cache
+
+// helper: show temporary toast
+function toast(msg) {
+  const el = document.getElementById('notification');
+  el.textContent = msg;
+  el.style.backgroundColor = type === 'error' ? 'var(--danger)' : 'var(--success)';
+  el.style.display = 'block';
+  setTimeout(() => {
+    el.classList.add('show');
+    setTimeout(() => { el.classList.remove('show'); }, 2700);
+  }, 10);
+}
+
+// --- AUTHENTICATION ---
+let AUTH_HEADER = null;
+
+async function apiFetch(url, options = {}) {
+  if (!AUTH_HEADER) throw new Error("Não autenticado.");
+  
+  const headers = { ...options.headers, 'Authorization': AUTH_HEADER };
+  const response = await fetch(url, { ...options, headers });
+
+  if (!response.ok) throw new Error(`Erro na requisição: ${response.statusText}`);
+
+  return response;
+}
+
+// load stock from server
+async function loadStock(){
+  try {
+    const res = await apiFetch('/get-stock');
+    const data = await res.json();
+    STOCK = data;
+    renderStockList();
+    renderDeliveryOptions();
+    renderEmbedPreview();
+    loadConfig(); // Carrega as configurações também
+    loadBannedUsers();
+  } catch (err) {
+    console.error('Erro loadStock', err);
+    toast('Erro ao carregar stock');
+  }
+}
+
+function renderStockList(){
+  stockList.innerHTML = '';
+  STOCK.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    const pct = Math.round((item.quantity / (item.max||item.quantity||100)) * 100);
+    el.innerHTML = `
+      <div class="thumb">${item.emoji||'🍉'}</div>
+      <div class="meta">
+        <h3>${item.name}</h3>
+        <small>Preço: R$${Number(item.price).toFixed(2)} • Estoque: ${item.quantity>0?item.quantity:'ESGOTADO'}</small>
+      </div>
+      <div class="controls">
+        <input type="number" id="${item.id}_price_in" value="${Number(item.price).toFixed(2)}" step="0.01" style="width: 90px; text-align: center;">
+        <input type="number" id="${item.id}_qty_in" value="${item.quantity}" min="0" style="width: 80px; text-align: center;">
+        <button class="btn-primary" data-id="${item.id}" onclick="quickSave('${item.id}')" style="padding: 8px 12px;">Salvar</button>
+      </div>
+    `;
+    stockList.appendChild(el);
+  }); 
+}
+
+// quick save single item
+async function quickSave(id){
+  const priceEl = document.getElementById(`${id}_price_in`);
+  const qtyEl = document.getElementById(`${id}_qty_in`);
+  const payload = {};
+  payload[`${id}_price`] = parseFloat(priceEl.value);
+  payload[`${id}_quantity`] = parseInt(qtyEl.value);
+  try {
+    const res = await apiFetch('/update-stock', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    await loadStock();
+    toast('Item atualizado');
+  } catch (e) { console.error(e); toast('Erro ao salvar'); }
+}
+
+// render delivery select
+function renderDeliveryOptions(){
+  deliveryItemSelect.innerHTML = '';
+  STOCK.forEach(it => {
+    const o = document.createElement('option');
+    o.value = it.id;
+    o.textContent = `${it.emoji} ${it.name} — R$${Number(it.price).toFixed(2)} • ${it.quantity>0?it.quantity:'ESGOTADO'}`;
+    deliveryItemSelect.appendChild(o);
+  });
+}
+
+// ADD fruit UI
+openAddBtn.addEventListener('click', ()=> addPanel.style.display='block');
+btnCancelAdd.addEventListener('click', ()=> addPanel.style.display='none');
+
+btnAddFruit.addEventListener('click', async ()=>{
+  const name = newName.value.trim();
+  if(!name) return toast('Nome obrigatório');
+  const payload = {
+    id: name.toUpperCase().replace(/\s+/g,'_'),
+    name: name,
+    emoji: newEmoji.value.trim() || '',
+    price: Number(newPrice.value) || 0,
+    quantity: Number(newQty.value) || 0,
+    max: Number(newQty.value) || 100
+  };
+  try { 
+    const res = await apiFetch('/add-fruit', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if(data.status === 'success') {
+      addPanel.style.display='none';
+      newName.value = newEmoji.value = newPrice.value = newQty.value = '';
+      await loadStock();
+      toast('Fruta adicionada');
+    } else {
+      toast(data.message || 'Erro ao adicionar');
+    }
+  } catch (e) {
+    console.error(e);
+    toast('Erro ao adicionar fruta');
+  }
+});
+
+// create delivery
+btnCreateDelivery.addEventListener('click', async () => {
+  const mention = document.getElementById('delivery-mention').value.trim();
+  const itemId = document.getElementById('delivery-item').value;
+  const qty = Number(document.getElementById('delivery-qty').value) || 1;
+  const note = document.getElementById('delivery-note').value.trim();
+  const photoInput = document.getElementById('delivery-photo');
+
+  if(!itemId) return toast('Escolha um produto');
+
+  const form = new FormData();
+  form.append('mention', mention);
+  form.append('itemId', itemId);
+  form.append('quantity', qty);
+  form.append('note', note);
+
+  if(photoInput.files && photoInput.files[0]) form.append('photo', photoInput.files[0]);
+
+  try {
+    const res = await apiFetch('/deliver', { method: 'POST', body: form }); // Note: apiFetch won't set Content-Type for FormData, which is correct
+    const data = await res.json();
+    if(data.status === 'success') {
+      toast('Entrega criada e enviada!');
+      await loadStock(); // Atualiza o estoque local após a entrega
+      loadDeliveries();
+    } else {
+      toast('Falha ao enviar entrega');
+    }
+  } catch (e) {
+    console.error('Erro deliver', e);
+    toast('Erro ao criar entrega');
+  }
+});
+
+// load deliveries history
+async function loadDeliveries(){
+  try {
+    const res = await apiFetch('/get-deliveries');
+    const arr = await res.json();
+    deliveriesList.innerHTML = '';
+    arr.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'delivery';
+      el.innerHTML = `
+        <div><strong>${d.itemName}</strong> x${d.quantity} — ${d.mention || 'sem destinatário'}</div>
+        ${d.photoUrl ? `<div style="margin-top:8px"><img src="${d.photoUrl}" style="max-width:100%;border-radius:8px"></div>` : ''}
+        <time>${new Date(d.timestamp).toLocaleString()}</time>
+      `;
+      deliveriesList.appendChild(el);
+    });
+  } catch(e) { console.error('loadDeliveries', e); }
+}
+
+// load banned users
+async function loadBannedUsers() {
+  try {
+    const res = await apiFetch('/get-bans');
+    const bans = await res.json();
+    bannedUsersList.innerHTML = '';
+    if (bans.length === 0) {
+      bannedUsersList.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">Nenhum usuário banido.</p>';
+      return;
+    }
+    bans.forEach(ban => {
+      const el = document.createElement('div');
+      el.innerHTML = `<div><strong>${ban.user.tag}</strong> (ID: ${ban.user.id})</div><small>Motivo: ${ban.reason || 'Não especificado'}</small>`;
+      bannedUsersList.appendChild(el);
+    });
+  } catch (e) { console.error('loadBannedUsers', e); }
+}
+
+// embed preview
+function renderEmbedPreview(){
+  embedPreview.innerHTML = '';
+  const el = document.createElement('div');
+  el.style.padding='12px'; 
+  el.style.borderRadius='8px'; 
+  el.innerHTML = `<strong style="color: var(--text-primary);">DOLLYA STORE | TABELA DE PREÇOS</strong><div style="margin-top:12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">${STOCK.map(it=>`<div style="font-size: 14px; line-height: 1.4;"><span style="margin-right: 4px;">${it.emoji}</span> <strong>${it.name}</strong><br><span style="color: var(--text-secondary);">R$${Number(it.price).toFixed(2)} • ${it.quantity>0?it.quantity:'ESGOTADO'}</span></div>`).join('')}</div>`;
+  embedPreview.appendChild(el);
+}
+
+// push main embed using main webhook/messageId fields in server config or manual (main webhook is configured server-side)
+btnPushMain.addEventListener('click', async () => {
+  // this endpoint uses server-side configured webhook & messageId (index.js)
+  try {
+    const res = await apiFetch('/update-stock',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({}) // will just trigger writing current STOCK in server if desired
+    });
+    await res.json();
+    toast('Solicitado update do embed principal (se configurado).');
+  } catch(e) { console.error(e); toast('Erro ao atualizar embed'); }
+});
+
+// export / import
+btnExport.addEventListener('click', () => {
+  const dataStr = JSON.stringify(STOCK, null, 2);
+  const blob = new Blob([dataStr], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'stock-export.json';
+  a.click();
+});
+
+btnImport.addEventListener('click', () => {
+  const inp = document.createElement('input');
+  inp.type = 'file';
+  inp.accept = 'application/json';
+  inp.onchange = async () => {
+    const file = inp.files[0];
+    if(!file) return;
+    const text = await file.text();
+    try {
+      const parsed = JSON.parse(text);
+      // send to server to overwrite stock (careful)
+      await apiFetch('/update-stock', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(parsed.reduce((acc,cur)=>{
+          // convert to flat payload e.g. TOMATRIO_price, TOMATRIO_quantity
+          acc[`${cur.id}_price`] = Number(cur.price);
+          acc[`${cur.id}_quantity`] = Number(cur.quantity);
+          return acc;
+        },{}))
+      });
+      await loadStock();
+      toast('Importado com sucesso');
+    } catch(e) {
+      console.error(e);
+      toast('Arquivo inválido');
+    }
+  };
+  inp.click();
+});
+
+// CONFIG management
+async function loadConfig() {
+  try {
+    const res = await apiFetch('/get-config');
+    const config = await res.json();
+    // Atualiza os campos com os IDs dos canais
+    if (config.mainChannelId) stockChannelIdInput.value = config.mainChannelId;
+    if (config.deliveryChannelId) deliveryChannelIdInput.value = config.deliveryChannelId;
+    if (config.mainMessageId) mainMessageIdInput.value = config.mainMessageId;
+    if (config.clientRoleId) clientRoleIdInput.value = config.clientRoleId;
+    if (config.guildId) guildIdInput.value = config.guildId;
+    if (config.reviewsChannelId) reviewsChannelIdInput.value = config.reviewsChannelId;
+
+    // Se a configuração for externa, desativa os campos
+    if (config.isManagedExternally) {
+      stockChannelIdInput.disabled = true;
+      deliveryChannelIdInput.disabled = true;
+      mainMessageIdInput.disabled = true;
+      clientRoleIdInput.disabled = true;
+      guildIdInput.disabled = true;
+      reviewsChannelIdInput.disabled = true;
+      btnSaveConfig.disabled = true;
+      btnSaveConfig.style.opacity = 0.5;
+      btnSaveConfig.style.cursor = 'not-allowed';
+      document.getElementById('config-external-note').style.display = 'block';
+    }
+
+
+  } catch (e) {
+    console.error('Erro ao carregar configurações', e);
+    toast('Não foi possível carregar as configurações.');
+  }
+}
+
+btnSaveConfig.addEventListener('click', async () => {
+  const mainChannelId = stockChannelIdInput.value.trim();
+  const deliveryChannelId = deliveryChannelIdInput.value.trim();
+  const mainMessageId = mainMessageIdInput.value.trim(); // Também salvamos o messageId
+  const clientRoleId = clientRoleIdInput.value.trim();
+  const guildId = guildIdInput.value.trim();
+  const reviewsChannelId = reviewsChannelIdInput.value.trim();
+
+  try {
+    const res = await apiFetch('/save-config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mainChannelId, deliveryChannelId, mainMessageId, clientRoleId, guildId, reviewsChannelId })
+    });
+    await res.json();
+    toast('Configurações salvas com sucesso!');
+  } catch (e) {
+    console.error('Erro ao salvar configurações', e);
+    toast('Falha ao salvar as configurações.');
+  }
+});
+
+// --- LOGIN LOGIC ---
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  loginError.style.display = 'none';
+  const user = loginUser.value;
+  const pass = loginPass.value;
+
+  const credentials = btoa(`${user}:${pass}`);
+  const tempAuthHeader = `Basic ${credentials}`;
+
+  try {
+    // Tenta fazer uma requisição autenticada para verificar as credenciais
+    const response = await fetch('/get-config', { headers: { 'Authorization': tempAuthHeader } });
+
+    if (response.ok) {
+      // Sucesso! Armazena o cabeçalho e inicializa o painel
+      AUTH_HEADER = tempAuthHeader;
+      loginScreen.style.display = 'none';
+      appContainer.style.display = 'block';
+      refreshBtn.addEventListener('click', loadStock);
+      loadStock();
+      loadDeliveries();
+    } else {
+      loginError.style.display = 'block';
+    }
+  } catch (error) {
+    loginError.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>

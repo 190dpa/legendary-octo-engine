@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Estatísticas - Dollya Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns"></script>
+    <style>
+        :root {
+            --background: #111827;
+            --card-bg: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --accent: #5865f2;
+            --border-color: #374151;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .stat-card h2 {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin: 0 0 0.5rem 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card .value {
+            font-size: 2.25rem;
+            font-weight: 700;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+        .chart-container {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        @media (max-width: 900px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dashboard de Estatísticas</h1>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h2>Receita Total</h2>
+                <div class="value">R$ <%= totalRevenue.toFixed(2) %></div>
+            </div>
+            <div class="stat-card">
+                <h2>Vendas Totais</h2>
+                <div class="value"><%= totalSales %></div>
+            </div>
+            <div class="stat-card">
+                <h2>Itens Vendidos</h2>
+                <div class="value"><%= totalItemsSold %></div>
+            </div>
+            <div class="stat-card">
+                <h2>Ticket Médio</h2>
+                <div class="value">R$ <%= averageTicket.toFixed(2) %></div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <canvas id="salesOverTimeChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="topProductsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elemento oculto para armazenar os dados dos gráficos de forma segura -->
+    <div id="chart-data" style="display: none;"
+         data-sales='<%- JSON.stringify(salesOverTime) %>'
+         data-products='<%- JSON.stringify(topProducts) %>'>
+    </div>
+
+    <script>
+        const chartDataElement = document.getElementById('chart-data');
+        const salesOverTimeData = JSON.parse(chartDataElement.dataset.sales);
+        const topProductsData = JSON.parse(chartDataElement.dataset.products);
+
+        // Gráfico de Vendas ao Longo do Tempo
+        const ctxSales = document.getElementById('salesOverTimeChart').getContext('2d');
+        new Chart(ctxSales, {
+            type: 'line',
+            data: {
+                labels: salesOverTimeData.map(d => d.date),
+                datasets: [{
+                    label: 'Receita por Dia',
+                    data: salesOverTimeData.map(d => d.revenue),
+                    borderColor: '#5865f2',
+                    backgroundColor: 'rgba(88, 101, 242, 0.2)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'day',
+                            tooltipFormat: 'dd/MM/yyyy'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Data'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Receita (R$)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Receita Diária',
+                        font: {
+                            size: 18
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Produtos Mais Vendidos
+        const ctxTopProducts = document.getElementById('topProductsChart').getContext('2d');
+        new Chart(ctxTopProducts, {
+            type: 'doughnut',
+            data: {
+                labels: topProductsData.map(p => p.itemName),
+                datasets: [{
+                    label: 'Unidades Vendidas',
+                    data: topProductsData.map(p => p.quantity),
+                    backgroundColor: [
+                        '#5865f2',
+                        '#22c55e',
+                        '#f97316',
+                        '#ef4444',
+                        '#8b5cf6'
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Produtos Mais Vendidos (Unidades)',
+                        font: {
+                            size: 18
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
